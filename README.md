@@ -97,7 +97,7 @@ The rule is applied when the lengths of the 2 tested strings are _n_ characters 
 
 #### validators
 
-A validator uses the typed of found errors to say if 2 data may be the same or not. The known errors are codified by keywords:
+A validator uses the type of found errors to say if 2 data may be the same or not. The known errors are codified by keywords:
 
 * ```:inv``` An inversion is found ("AB" vs. "BA")
 * ```:sub``` A substitution is found ("AB" vs. "CB") 
@@ -117,7 +117,7 @@ In the map _m_, you define the number of errors grouped by their type the rule a
 ```:forbidden v```
 The vector _v_ contains a list of errors mustn't be found while the comparison of 2 strings.
 
-> When a case in a validator is encoutered then it overrides all others.
+> When a case in a validator is encountered then it overrides all others.
 > Thus, if :max-errors is set to 3 and :forbidden set to [:sub] then the rule invalidates any comparison when a subsitution is found, even if the substitution is the first error.
 
 ### The default rule
