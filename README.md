@@ -16,7 +16,39 @@ For that, some rules must be applied following the data context. Indeed, compare
 
 ## Usage
 
-FIXME
+### Basics
+
+The matching rules are defined in environments. That lets you define different cases like (for example):
+
+* Rules about minor errors (you can consider 2 data with this sort of error are the same)
+* Rules to errors that might lead to human validation
+* Rules about weak likeness
+
+To define an environment, you should use the ```def-matching-env``` macro. This macro returns a matching function will use the environment rules. A matching function takes 2 arguments are strings to compare and returns a boolean that says if the 2 datas are the _same_ following the rules.
+
+An example (can be found in the test code):
+
+```
+(let [ruled-candidates? (def-matching-env 2
+                              (rule :max-length 4 :authorized {:inv 1 :delete 2} :forbidden [:sub])
+                              (rule :length 5 :authorized {:sub 1} :max-errors 3))]
+      
+      (is (false? (ruled-candidates? "foo" "bar")))
+      (is (true? (ruled-candidates? "foo" "foo")))
+      (is (true? (ruled-candidates? "bar" "bra")))
+
+      ;; the 2 tests below use the default rule
+      (is (true? (ruled-candidates? "123456789" "123456789")))
+      (is (false? (ruled-candidates? "123456789" "132457698"))))
+```
+
+### Rule definition
+
+TODO
+
+### The default rule
+
+TODO
 
 ## License
 
