@@ -135,7 +135,7 @@ To solve this issue, you define this matching environment:
 ```clojure
 (let [valid-account? (def-matching-env 1
                               (rule :authorized {:inv 1} :forbidden [:sub :insert :delete]))]
-…                              
+…)                              
 ```
 
 ### Several environments
