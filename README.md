@@ -28,7 +28,7 @@ To define an environment, you should use the ```def-matching-env``` macro. This 
 
 An example (can be found in the test code):
 
-```
+```clojure
 (let [ruled-candidates? (def-matching-env 2
                               (rule :max-length 4 :authorized {:inv 1 :delete 2} :forbidden [:sub])
                               (rule :length 5 :authorized {:sub 1} :max-errors 3))]
