@@ -120,6 +120,9 @@ The _n_ errors are accepted by the rule. If this validator is not provided then 
 ```:authorized m``` 
 In the map _m_, you define the number of errors grouped by their type the rule accepts.
 
+> If you want to define all error types with the same max number of errors, you can code
+> ```:autorized {:all 1}```.
+
 ```:forbidden v```
 The vector _v_ contains a list of errors mustn't be found while the comparison of 2 strings.
 
