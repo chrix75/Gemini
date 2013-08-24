@@ -44,10 +44,12 @@
     (let [env (-> (matching-env 2)
                   (rule :max-length 4 :authorized {:inv 1 :delete 2} :max-errors 3 :forbidden [:sub])
                   (rule :length 5 :authorized {:sub 1})
+                  (rule :min-length 6 :max-length 8)
                   (rule))]
 
       (is (= 5 (:length (accepted-rule (:rules env) "abcde" "abcde"))))
-      (is (= 4 (:max-length (accepted-rule (:rules env) "abc" "abcd"))))))
+      (is (= 4 (:max-length (accepted-rule (:rules env) "abc" "abcd"))))
+      (is (= 6 (:min-length (accepted-rule (:rules env) "abcdef" "abcdefg"))))))
 
   ;; In the following test, we define a matching env with 2 rules.
   ;; The first rule concerns the words whose length is between 1 and 4

@@ -89,17 +89,22 @@
    The known attributes are:
      :length The rule is applied for the words with this length.
      :max-length The rule is applied for the words with length is at more the given length.
+     :min-length The rule is applied for the words with length is at least the given length.
      :authorized A map gives the max errors of each type.
      :forbidden A vector with the error types are not authorized.
      :max-errors The max number of errors authorized for this rule (overrides the ME default value)."
-  [env & {:keys [length max-length authorized max-errors forbidden] :as rule}]
+  [env & {:keys [length max-length min-length authorized max-errors forbidden] :as rule}]
 
-  (when-not (or (nil? length) (nil? max-length))
-    (throw (Exception. "You can't define a length and a max-length attributes.")))
+   (when-not (or (nil? length) (nil? max-length))
+     (throw (Exception. "You can't define a length and a max-length attributes.")))
 
-  (validate-positive-value "max-length" max-length)
-  (validate-positive-value "length" length)
-  (validate-positive-value "max-errors" max-errors)
+   (when-not (or (nil? length) (nil? min-length))
+     (throw (Exception. "You can't define a length and a min-length attributes.")))
+
+   (validate-positive-value "max-length" max-length)
+   (validate-positive-value "min-length" min-length)
+   (validate-positive-value "length" length)
+   (validate-positive-value "max-errors" max-errors)
 
   (when-not (or (nil? authorized) (map? authorized))
     (throw (Exception. "The value of the authorized attribute must be a map.")))
@@ -152,19 +157,24 @@
       (inc-error-counter (:type e))
       (assoc :accepted false)))
 
+
 ;; Question: is the inner function is put ouside the loop?
 (defn accepted-rule
   [rs w1 w2]
   (some (fn [r]
-            (let [max-l (:max-length r)
-                  l (:length r)]
-              (if (and (nil? max-l) (nil? l))
-                r
-                (let [w1-l (count w1) w2-l (count w2)]
-                  (if (and (= l w1-l) (= l w2-l))
-                    r
-                    (if (and max-l (<= w1-l max-l) (<= w2-l max-l))
-                      r)))))) rs))
+          (let [max-l (:max-length r)
+                min-l (:min-length r)
+                l (:length r)]
+            (if (and (nil? max-l) (nil? min-l) (nil? l))
+              r
+              (let [w1-l (count w1) w2-l (count w2)]
+                (if (and (= l w1-l) (= l w2-l))
+                  r
+                  (when (or max-l min-l)
+                    (let [max-gap (if max-l max-l 0)
+                          min-gap (if min-l min-l 0)]
+                      (when (and (<= w1-l max-gap) (>= w1-l min-gap) (<= w2-l max-gap) (>= w2-l min-gap))
+                        r)))))))) rs))
 
 (defn ruled-candidates-fn
   "Returns the matching function that 'ate' the rules from an environment.

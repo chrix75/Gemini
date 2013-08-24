@@ -20,7 +20,7 @@ For that, some rules must be applied following the data context. Indeed, compare
 
 If you use Leiningen then add this dependecy in your project.clj file:
 
-```[gemini "0.2.0"]```
+```[gemini "0.2.1"]```
 
 If you use Maven:
 
@@ -28,7 +28,7 @@ If you use Maven:
 <dependency>
   <groupId>gemini</groupId>
   <artifactId>gemini</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
 </dependency>
 ``` 
 
@@ -93,7 +93,13 @@ The rule is applied when the 2 tested strings have _n_ characters.
 ```:max-length n```
 The rule is applied when the lengths of the 2 tested strings are _n_ characters at most.
 
+```:min-length n```
+The rule is applied when the lengths of the 2 tested strings are _n_ characters at least.
+
 > If none selector is given then the rule may be applied regardless of the string length.
+>
+> You can define a gap by using the ```min-length``` and ```max-length``` in the same rule.
+
 
 #### validators
 
