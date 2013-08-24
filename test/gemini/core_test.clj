@@ -105,10 +105,9 @@
       (is (empty? (fuzzy-filter coll s)))))
 
   (testing "A french case"
-    (let [s "Égilse"
-          coll ["église" "Eglise" "Église" "Elise" "Elise" "élise"]
+    (let [coll ["église" "Eglise" "Église" "Elise" "Elise" "élise"]
           clean-fn (fn [s] (-> (clojure.string/upper-case s) (clojure.string/replace #"[ÉÈÊË]" "E")))
           found? (def-matching-env 1 (rule :authorized {:inv 1} :forbidden [:sub :insert :delete]))
           fuzzy-filter (fuzzy-filter-fn found? clean-fn clean-fn)]
 
-      (is (= ["église" "Eglise" "Église"] (fuzzy-filter coll s))))))
+      (is (= ["église" "Eglise" "Église"] (fuzzy-filter coll "Égilse"))))))
