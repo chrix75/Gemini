@@ -120,7 +120,7 @@ The _n_ errors are accepted by the rule. If this validator is not provided then 
 ```:authorized m``` 
 In the map _m_, you define the number of errors grouped by their type the rule accepts.
 
-> If you want to define all error types with the same max number of errors, you can code
+> [v. 0.3.0] If you want to define all error types with the same max number of errors, you can code
 > ```:autorized {:all 1}```.
 
 ```:forbidden v```
