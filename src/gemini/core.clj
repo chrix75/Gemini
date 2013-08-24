@@ -197,6 +197,8 @@
    The fns arguments are (in the order): the cleansing function for the input data and the next one is to clean the collection items.
    If you clean only the collection item, you pass identity function as the input data cleansing function.
 
+   The cleansing functions must take one argument: the data to clean.
+
    The returned function take 2 args: the collection and the input data."
   [matching-fn & fns]
   (let [define-cleansing (fn [fn] (if fn fn identity))
