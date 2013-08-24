@@ -1,4 +1,4 @@
-(defproject gemini "0.1.0"
+(defproject gemini "0.2.0"
   :description "A data matching library"
   :url "https://github.com/chrix75/Gemini"
   :license {:name "Eclipse Public License"
