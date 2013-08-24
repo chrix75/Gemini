@@ -42,11 +42,13 @@
   ;; max-errors value.
   (testing "should return the accepted rule"
     (let [env (-> (matching-env 2)
+                  (rule :length 3 :authorized {:all 1})
                   (rule :max-length 4 :authorized {:inv 1 :delete 2} :max-errors 3 :forbidden [:sub])
                   (rule :length 5 :authorized {:sub 1})
                   (rule :min-length 6 :max-length 8)
                   (rule))]
 
+      (is (= 1 (get-in (accepted-rule (:rules env) "abc" "abc") [:authorized :sub])))
       (is (= 5 (:length (accepted-rule (:rules env) "abcde" "abcde"))))
       (is (= 4 (:max-length (accepted-rule (:rules env) "abc" "abcd"))))
       (is (= 6 (:min-length (accepted-rule (:rules env) "abcdef" "abcdefg"))))))

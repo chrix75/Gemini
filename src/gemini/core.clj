@@ -82,6 +82,12 @@
     (assoc r :max-errors (:max-errors e))
     r))
 
+(defn manage-all-authorized
+  [r]
+  (if-let [all (get-in r [:authorized :all])]
+    (assoc r :authorized {:inv all :sub all :insert all :delete all})
+    r))
+
 (defn rule
   "Adds a new rule to the matching environment. The first arg is the environment to update.
    The following arguments define the new rule. The syntax of these arguments is like a map
@@ -113,7 +119,8 @@
     (throw (Exception. "The value of the authorized attribute must be a vector.")))
 
   (let [current-rules (:rules env)
-        rule-to-add (manage-max-errors env rule)]
+        rule-to-add (-> (manage-max-errors env rule)
+                        (manage-all-authorized))]
     
     (when-not (:max-errors rule-to-add)
     (throw (Exception. "You must define the max-errors attribute (either in the matching environment or the rule declaration).")))
