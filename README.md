@@ -20,7 +20,7 @@ For that, some rules must be applied following the data context. Indeed, compare
 
 If you use Leiningen then add this dependecy in your project.clj file:
 
-```[gemini "0.1.0"]```
+```[gemini "0.2.0"]```
 
 If you use Maven:
 
@@ -28,7 +28,7 @@ If you use Maven:
 <dependency>
   <groupId>gemini</groupId>
   <artifactId>gemini</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 </dependency>
 ``` 
 
@@ -182,6 +182,36 @@ Below the code:
 ;; And now, we search the values from the collection
 (filter #(my-f v (clean-value %)) coll)
 ```
+**Updated for the version 0.2.0**
+
+```clojure
+(let [coll ["église" "Eglise" "Église" "Elise" "Elise" "élise"]
+          clean-fn (fn [s] (-> (clojure.string/upper-case s) (clojure.string/replace #"[ÉÈÊË]" "E")))
+          found? (def-matching-env 1 (rule :authorized {:inv 1} :forbidden [:sub :insert :delete]))
+          fuzzy-filter (fuzzy-filter-fn found? clean-fn clean-fn)]
+
+      (is (= ["église" "Eglise" "Église"] (fuzzy-filter coll "Égilse"))))
+```
+
+## Helper functions
+
+### fuzzy-filter-fn
+
+> See the french use case
+
+Returns a function that filters collection by using a matching function.
+   
+The first argument of the fuzzy-filter-fn is the matching function returned by the def-matching-env macro.
+
+The fns arguments are (in the order): the cleansing function for the input data and the next one is to clean the collection items.
+
+The returned function take 2 args: the collection and the input data.      
+
+>If you clean only the collection item, you pass identity function as the input data cleansing function.
+
+>The cleansing functions must take one argument: the data to clean.
+
+   
 
 
 ## License
