@@ -158,6 +158,32 @@ For that case, we define 2 environments. The account numbers that don't pass the
 …)
 ```
 
+### A french case
+
+> Thanks to Bastien for that case.
+
+Let's imagine you have french data values (with accentued characters).
+First, you have a collection: ```"église" "Eglise" "Église" "Elise" "Élise" "élise"``` and you have as input value ```Égilse```.
+
+You expect to have this result ```"église" "Eglise" "Église"```.
+
+Below the code:
+
+```clojure
+;; we define a function to clean and prepare the compared value
+(defn clean-value [s] (-> (.toUpperCase s) (clojure.string/replace #"[ÉÈÊË]" "E")))
+
+;; It's the input data
+(def v (clean-value "Égilse"))
+
+;; Here, the rule 
+(def my-f (def-matching-env 1 (rule :authorized {:inv 1} :forbidden [:sub :delete :insert])))
+
+;; And now, we search the values from the collection
+(filter #(my-f v (clean-value %)) coll)
+```
+
+
 ## License
 
 Copyright © 2013 ChriX
