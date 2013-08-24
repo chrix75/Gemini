@@ -76,3 +76,30 @@
       (is (true? (ruled-candidates? "123456789" "123456789")))
       (is (false? (ruled-candidates? "123456789" "132457698"))))))
 
+(deftest test-search-coll
+  ;; in the test below only one inversion error is authorized
+  (testing "should return the items from a collection match with rules (with cleansing function for all data)"
+    (let [s "Doctor Woh"
+          coll ["DOCTOR WHO" "doctor who" "dalek" "DALEK"]
+          found? (def-matching-env 1 (rule :authorized {:inv 1} :forbidden [:sub :insert :delete]))
+          fuzzy-filter (fuzzy-filter-fn found? clojure.string/upper-case clojure.string/upper-case)]
+
+      (is (= ["DOCTOR WHO" "doctor who"] (fuzzy-filter coll s)))))
+
+  (testing "should return the item from a collection match with rules (in this test, the collection items are clean already)"
+    (let [s "Doctor Woh"
+          coll ["DOCTOR WHO" "doctor who" "dalek" "DALEK"]
+          found? (def-matching-env 1 (rule :authorized {:inv 1} :forbidden [:sub :insert :delete]))
+          ;; no cleansing function for the collection items
+          fuzzy-filter (fuzzy-filter-fn found? clojure.string/upper-case)]
+
+      (is (= ["DOCTOR WHO"] (fuzzy-filter coll s)))))
+
+  (testing "shouldn't return any item from a collection because no cleansing functions are provided"
+    (let [s "Doctor Woh"
+          coll ["DOCTOR WHO" "doctor who" "dalek" "DALEK"]
+          found? (def-matching-env 1 (rule :authorized {:inv 1} :forbidden [:sub :insert :delete]))
+          ;; no cleansing function for the collection items
+          fuzzy-filter (fuzzy-filter-fn found?)]
+
+      (is (empty? (fuzzy-filter coll s))))))

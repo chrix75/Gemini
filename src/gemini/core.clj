@@ -191,3 +191,18 @@
        (rule)
        (ruled-candidates-fn)))
 
+(defn fuzzy-filter-fn
+  "Returns a function that filters collection by using a matching function.
+   The first argument of the fuzzy-filter-fn is the matching function returned by the def-matching-env macro.
+   The fns arguments are (in the order): the cleansing function for the input data and the next one is to clean the collection items.
+   If you clean only the collection item, you pass identity function as the input data cleansing function.
+
+   The returned function take 2 args: the collection and the input data."
+  [matching-fn & fns]
+  (let [define-cleansing (fn [fn] (if fn fn identity))
+        input-cleansing (define-cleansing (first fns))
+        coll-cleansing (define-cleansing (second fns))]
+    
+    (fn [coll s]
+      (let [clean-s (input-cleansing s)]
+        (filter #(matching-fn clean-s (coll-cleansing %)) coll)))))
