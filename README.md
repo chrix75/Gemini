@@ -20,7 +20,7 @@ For that, some rules must be applied following the data context. Indeed, compare
 
 If you use Leiningen then add this dependecy in your project.clj file:
 
-```[gemini "0.2.1"]```
+```[gemini "0.3.0"]```
 
 If you use Maven:
 
@@ -28,7 +28,7 @@ If you use Maven:
 <dependency>
   <groupId>gemini</groupId>
   <artifactId>gemini</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
 </dependency>
 ``` 
 
@@ -120,7 +120,7 @@ The _n_ errors are accepted by the rule. If this validator is not provided then 
 ```:authorized m``` 
 In the map _m_, you define the number of errors grouped by their type the rule accepts.
 
-> [v. 0.3.0] If you want to define all error types with the same max number of errors, you can code
+> If you want to define all error types with the same max number of errors, you can code
 > ```:autorized {:all 1}```.
 
 ```:forbidden v```
@@ -220,7 +220,60 @@ The returned function take 2 args: the collection and the input data.
 
 >The cleansing functions must take one argument: the data to clean.
 
-   
+## Extended functions
+
+The extended functions are functions rest upon the Gemini core and provide useful results while expressions comparaisons.
+
+### find-likeness
+
+The purpose of this function is to find the likeness between 2 expressions. For this function, an expression is several words separated by one space.
+
+The ```find-likeness``` function find the likeness thanks to matching functions defined by the ```def-matching-env``` macro. 
+You link each of those matching functions with a likeness marker in a map (you'll see an example below).
+
+The function use a shortcut function too. This function lets you don't test 2 words while likeness search. For instance, you can define a shortcut function to avoid compare 2 words when they don't start with the same letter.
+
+Below, an example from the tests:
+
+```clojure
+(deftest test-find-likeness
+  (testing "should find likeness of 2 expressions"
+    (let [strong? (def-matching-env 0
+                    (rule :min-length 5 :max-errors 1))
+          weak? (def-matching-env 0
+                  (rule :min-length 4 :max-length 5 :max-errors 1)
+                  (rule :min-length 6 :max-errors 2 :authorized {:all 1}))
+          poor? (def-matching-env 1
+                  (rule :max-length 3))
+
+          ;; we don't compare words if they don't start with the same letter
+          shortcut-fn (fn [a b] (not= (first a) (first b)))
+
+          strong-lk {:func strong? :likeness "S"}
+          weak-lk {:func weak? :likeness "W"}
+          poor-lk {:func poor? :likeness "P"}]
+
+      (is (= [{:likeness "=" :word1 "pipper" :word2 "pipper" :pos1 5 :pos2 5}
+              {:likeness "W" :word1 "rose" :word2 "roze" :pos1 1  :pos2 2}
+              {:likeness "W" :word1 "david" :word2 "davi" :pos1 2 :pos2 3}
+              {:likeness "P" :word1 "who" :word2 "woh" :pos1 3, :pos2 4}]
+             (find-likeness "rose david who daleks pipper" "dalisk roze davi woh pipper" shortcut-fn strong-lk weak-lk poor-lk))))))
+
+```
+
+In this example, we define 3 matching functions to mark different kinds of likeness and a shorcut-function (the one described before.)
+
+In the test clause, we see the result of the ```find-likeness``` function. 
+
+> NOTE: As you see, the ```find-likeness``` function defines by itself an equal matching function. This function is put before all other matching function you provide.
+
+After, according to your domain and business rules, you can decide if the 2 expressions characterize the same data.
+
+
+### find-likeness-without-shortcut
+
+I think the name is clear enough :)
+Its use is like the ```find-likeness``` except you don't define and give a shortcut function.
 
 
 ## License
