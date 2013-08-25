@@ -8,7 +8,7 @@
     (for [w (str/split e #" ")]
       {:pos (swap! pos inc) :word w})))
 
-(defn analyze-expressions-likeness
+(defn basic-find-likeness
   "Takes 2 expressions and calls the matching function matching function f on expressions words.
    Each word of the expression e1 is compared to every word of the expression e2.
 
@@ -53,8 +53,28 @@
                 retaineds)) [] ws)))
 
 (defn find-likeness
-  [e1 e2 shortcut f & lfs]
-  (let [lfs+equal (cons {:func = :likeness "="} (cons f lfs))]
+  "Compares 2 expressions (e1 and e2) and returns a collection of maps. To compare those 2 expressions, they're
+   splitted by words and after all words from e1 are compared to words of e2 by the matching functions lfs.
+   An automatic matching function is added as first matching function: the equal function. This function checks if
+   2 words are equal.
+
+   The shortcut arg is a shortcut function whose purpose is to optimize the matching. A shortcut function must take
+   2 arguments are words. If the shortcut fn returns true for 2 words then those words are not compared with the
+   matching functions.
+
+   Each value of lfs is a map containing the keys :func and :likeness. The value of :func is a function returned by
+   the def-matching-env macro. The value of :likeness is the value will have the :likeness property in a returned map when
+   2 words match.
+
+   Each item of the returned map collections is the description of the likeness of 2 words when they matche.
+   The description data are:
+   :word1 Word of the expression e1 matched
+   :word2 Word of the expression e2 matched
+   :pos1 The position of the word1 in its expression
+   :pos2 The position of the word2 in its expression
+   :likeness The likeness of the matching (= should be reserved to the equal function)"
+  [e1 e2 shortcut lfs]
+  (let [lfs+equal (cons {:func = :likeness "="} lfs)]
     (loop [ws1 (prepare-expr e1)
            ws2 (prepare-expr e2)
            matching-fns lfs+equal
@@ -66,6 +86,7 @@
         result))))
 
 (defn find-likeness-without-shortcut
-  [e1 e2 f & lfs]
-  (apply find-likeness e1 e2 (constantly false) f lfs))
+  "Likes the find-likeness function except you don't want shortcut."
+  [e1 e2 & lfs]
+  (apply find-likeness e1 e2 (constantly false) lfs))
 
