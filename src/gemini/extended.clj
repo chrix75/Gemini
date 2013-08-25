@@ -1,6 +1,5 @@
 (ns gemini.extended
-  (:require [gemini.core :refer [def-matching-env rule]]
-            [clojure.string :as str]))
+  (:require [clojure.string :as str]))
 
 (defn prepare-expr
   [e]
@@ -37,7 +36,7 @@
 (defn result-matching
   [ws1 ws2 sf {:keys [func likeness]}]
   (when (and (seq ws1) (seq ws2))
-    (filter #(not (nil? %)) (for [w1 ws1 w2 ws2 :when (not (sf w1 w2))]
+    (filter #(not (nil? %)) (for [w1 ws1 w2 ws2 :when (not (sf (:word w1)  (:word w2)))]
                               (when (func (:word w1) (:word w2))
                                   {:likeness likeness
                                    :word1 (:word w1) :word2 (:word w2)
@@ -59,8 +58,8 @@
    2 words are equal.
 
    The shortcut arg is a shortcut function whose purpose is to optimize the matching. A shortcut function must take
-   2 arguments are words. If the shortcut fn returns true for 2 words then those words are not compared with the
-   matching functions.
+   2 arguments are word. If the shortcut fn returns true for 2 words then those words are not compared with the
+   matching functions. 
 
    Each value of lfs is a map containing the keys :func and :likeness. The value of :func is a function returned by
    the def-matching-env macro. The value of :likeness is the value will have the :likeness property in a returned map when
@@ -73,7 +72,7 @@
    :pos1 The position of the word1 in its expression
    :pos2 The position of the word2 in its expression
    :likeness The likeness of the matching (= should be reserved to the equal function)"
-  [e1 e2 shortcut lfs]
+  [e1 e2 shortcut & lfs]
   (let [lfs+equal (cons {:func = :likeness "="} lfs)]
     (loop [ws1 (prepare-expr e1)
            ws2 (prepare-expr e2)
