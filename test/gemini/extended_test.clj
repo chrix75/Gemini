@@ -13,6 +13,7 @@
           poor? (def-matching-env 1
                   (rule :max-length 3))
 
+          ;; we don't compare words if they don't start with the same letter
           shortcut-fn (fn [a b] (not= (first a) (first b)))
 
           strong-lk {:func strong? :likeness "S"}
