@@ -114,8 +114,7 @@
   [& body]
   `(binding [*likeness-matching-fns-ctx* (atom [])
              *likeness-shortcut-fn-ctx* (atom nil)]
-     ~@body
-     nil))
+     ~@body))
 
 (defn def-likeness
   "Within a with-likeness macro, defines a link between a likeness value v and a matching function f."

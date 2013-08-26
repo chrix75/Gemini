@@ -20,7 +20,7 @@ For that, some rules must be applied following the data context. Indeed, compare
 
 If you use Leiningen then add this dependecy in your project.clj file:
 
-```[gemini "0.3.1"]```
+```[gemini "0.3.2"]```
 
 If you use Maven:
 
@@ -310,6 +310,10 @@ In this macro, you have the function ```def-likeness```, ```def-shortcut``` and 
 I think the names and the test above give information enough :)
 
 > Don't forget you don't have to define a shorcut function if you don't want.
+>
+> IMPORTANT: The first version of this macro (v. 0.3.1) always returned nil. From the Gemini version 0.3.2, 
+> this macro doesn't return nil.
+
 
 ## License
 
