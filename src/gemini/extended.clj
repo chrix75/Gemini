@@ -1,6 +1,9 @@
 (ns gemini.extended
   (:require [clojure.string :as str]))
 
+(def ^:private ^:dynamic *likeness-matching-fns-ctx* nil)
+(def ^:private ^:dynamic *likeness-shortcut-fn-ctx* nil)
+
 (defn prepare-expr
   [e]
   (let [pos (atom 0)]
@@ -89,3 +92,56 @@
   [e1 e2 & lfs]
   (apply find-likeness e1 e2 (constantly false) lfs))
 
+(defn config-find-likeness
+  "Returns a configured find-likeness function. With the returned function, you don't have to pass all arguments
+   for each call."
+  [& config]
+  (if (fn? (first config))
+    (fn [a b]
+      (apply find-likeness a b (first config) (rest config)))
+    (fn [a b]
+       (apply find-likeness-without-shortcut a b config))))
+
+(defmacro with-likeness
+  "Prepare a context to make likeness search.
+   We define your context with the functions:
+     def-likeness
+     def-shortcut
+
+   And you do your search by calling search-likeness.
+
+   This macro returns nil."  
+  [& body]
+  `(binding [*likeness-matching-fns-ctx* (atom [])
+             *likeness-shortcut-fn-ctx* (atom nil)]
+     ~@body
+     nil))
+
+(defn def-likeness
+  "Within a with-likeness macro, defines a link between a likeness value v and a matching function f."
+  [v f]
+  (if *likeness-matching-fns-ctx*
+    (if (fn? f)
+      (swap! *likeness-matching-fns-ctx* conj {:func f :likeness v})
+      (throw (Exception. "You must pass a matching function.")))
+    
+    (throw (Exception. "You must call def-likeness function inside a with-likeness macro."))))
+
+(defn def-shortcut
+  "Within a with-likeness macro, defines a shorcut function."
+  [f]
+  (if *likeness-matching-fns-ctx*
+    (if (fn? f)
+      (reset! *likeness-shortcut-fn-ctx* f)
+      (throw (Exception. "You must provide a function as shorcut.")))
+    (throw (Exception. "You must call def-shortcut function inside a with-likeness macro."))))
+
+(defn search-likeness
+  "Within a with-likeness macro, search the likeness between 2 expressions a and b resting upon the
+   current context."
+  [a b]
+  (if *likeness-shortcut-fn-ctx*
+    (if @*likeness-shortcut-fn-ctx*
+      (apply find-likeness a b @*likeness-shortcut-fn-ctx* @*likeness-matching-fns-ctx*)
+      (apply find-likeness-without-shortcut a b @*likeness-matching-fns-ctx*))
+    (throw (Exception. "You must call search-likeness function inside a with-likeness macro."))))
