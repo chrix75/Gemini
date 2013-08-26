@@ -20,7 +20,7 @@ For that, some rules must be applied following the data context. Indeed, compare
 
 If you use Leiningen then add this dependecy in your project.clj file:
 
-```[gemini "0.3.0"]```
+```[gemini "0.3.1"]```
 
 If you use Maven:
 
@@ -28,7 +28,7 @@ If you use Maven:
 <dependency>
   <groupId>gemini</groupId>
   <artifactId>gemini</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
 </dependency>
 ``` 
 
@@ -275,6 +275,41 @@ After, according to your domain and business rules, you can decide if the 2 expr
 I think the name is clear enough :)
 Its use is like the ```find-likeness``` except you don't define and give a shortcut function.
 
+### config-find-likeness
+
+This function returns a configured function (with likeness and shortcut if any). Thus, you can search the likeness between  expressions without to provide for each call all the configuration.
+(see the extended tests)
+
+### with-likeness
+
+This macro reduces the quantity of code and makes the life of the developer easier.
+
+Take a look:
+
+```clojure
+(testing "should find likeness of 2 expression by the macro"
+    (with-likeness
+      (def-likeness "S" (def-matching-env 0 (rule :min-length 5 :max-errors 1)))
+      
+      (def-likeness "W" (def-matching-env 0
+                          (rule :min-length 4 :max-length 5 :max-errors 1)
+                          (rule :min-length 6 :max-errors 2 :authorized {:all 1})))
+      
+      (def-likeness "P" (def-matching-env 1 (rule :max-length 3)))
+      
+      (def-shortcut (fn [a b] (not= (first a) (first b))))
+
+      (is (= [{:likeness "=" :word1 "pipper" :word2 "pipper" :pos1 5 :pos2 5}
+              {:likeness "W" :word1 "rose" :word2 "roze" :pos1 1  :pos2 2}
+              {:likeness "W" :word1 "david" :word2 "davi" :pos1 2 :pos2 3}
+              {:likeness "P" :word1 "who" :word2 "woh" :pos1 3, :pos2 4}]
+             (search-likeness "rose david who daleks pipper" "dalisk roze davi woh pipper")))))
+```
+
+In this macro, you have the function ```def-likeness```, ```def-shortcut``` and ```search-likeness```.
+I think the names and the test above give information enough :)
+
+> Don't forget you don't have to define a shorcut function if you don't want.
 
 ## License
 
