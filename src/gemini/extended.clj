@@ -108,9 +108,7 @@
      def-likeness
      def-shortcut
 
-   And you do your search by calling search-likeness.
-
-   This macro returns nil."  
+   And you do your search by calling search-likeness."  
   [& body]
   `(binding [*likeness-matching-fns-ctx* (atom [])
              *likeness-shortcut-fn-ctx* (atom nil)]
